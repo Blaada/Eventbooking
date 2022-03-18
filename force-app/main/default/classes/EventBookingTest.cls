@@ -5,77 +5,61 @@ public class EventBookingTest {
         public static void refuseCaseCreationWhenAnAccountIsNotAttachedToACase(){
             // Given
     
-            Case request = new Case(Origin = 'Phone',Subject = 'Event Booking', Description = 'Book Spots');
+            Case phoneCase = TestDataFactory.createCase('Phone');
             
             // When 
 
             Test.startTest();
 
-            Database.SaveResult result = Database.insert(request, false);
+            Database.SaveResult result = Database.insert(phoneCase, false);
 
             Test.stopTest();
 
             // Then
 
-            System.assert(!result.isSuccess());
-            System.assert(result.getErrors().size() > 0);
+            System.assert(!result.isSuccess(), 'Case should not be created.');
+            System.assert(result.getErrors().size() > 0, 'There is no errors occured while creating this Case.');
             System.assertEquals('You cannot create a request without attaching an account',
-            result.getErrors()[0].getMessage());
+            result.getErrors()[0].getMessage(), 'Case does not contain the specified error message.');
         }
         
         @isTest
         public static void refuseCaseCreationWhenNoContactIsAttachedToAnAccount(){
             // Given
-      
-            Account a1 = new Account(Name = 'Salesforce');
-            insert a1;
 
-            Case request = new Case(Origin = 'Phone',Subject = 'Event Booking', Description = 'Book Spots', AccountId = a1.ID);
-            
+            Case phoneCaseWithAccount = TestDataFactory.createCaseWithAccount('Phone', 0);
+
             // When 
 
             Test.startTest();
 
-            Database.SaveResult result = Database.insert(request, false);
+            Database.SaveResult result = Database.insert(phoneCaseWithAccount, false);
 
             Test.stopTest();
 
             // Then
 
-            System.assert(!result.isSuccess());
-            System.assert(result.getErrors().size() > 0);
+            System.assert(!result.isSuccess(),'Case should not be created.');
+            System.assert(result.getErrors().size() > 0, 'There is no errors occured while creating this Case.');
             System.assertEquals('You cannot create a request for accounts without contacts',
-            result.getErrors()[0].getMessage());
+            result.getErrors()[0].getMessage(), 'Case does not contain the specified error message.');
         }
         
         @isTest
         public static void bookEventFromPhone(){
             // Given
             
-            Account a1 = new Account(Name = 'Salesforce');
-            insert a1;
-            
-            Contact c1 = new Contact(LastName = 'Contact 1', AccountId = a1.ID);
-            insert c1;
-    
-            Contact c2 = new Contact(LastName = 'Contact 2', AccountId = a1.ID);
-            insert c2;
-    
-            Contact c3 = new Contact(LastName = 'Contact 3', AccountId = a1.ID);
-            insert c3;
-    
-            Case request = new Case(Origin = 'Phone',Subject = 'Event Booking', Description = 'Book Spots for Company A1 & their 3 employees', AccountId = a1.ID);
-            
+            Case phoneCaseWithAccountContacts = TestDataFactory.createCaseWithAccount('Phone', 3);        
             // When 
 
             Test.startTest();
 
-            Database.SaveResult result = Database.insert(request, false);
+            Database.SaveResult result = Database.insert(phoneCaseWithAccountContacts, false);
             Test.stopTest();
 
             // Then
 
-            System.assert(result.isSuccess());
+            System.assert(result.isSuccess(), 'Case creation should be successful');
 
 
         }
@@ -85,36 +69,21 @@ public class EventBookingTest {
         public static void refuseEventBookingWhenNumberOfAttendeesIsMoreThanThreeForPhoneCases(){
             // Given
             
-            Account a1 = new Account(Name = 'Salesforce');
-            insert a1;
-            
-            Contact c1 = new Contact(LastName = 'Contact 1', AccountId = a1.ID);
-            insert c1;
-    
-            Contact c2 = new Contact(LastName = 'Contact 2', AccountId = a1.ID);
-            insert c2;
-    
-            Contact c3 = new Contact(LastName = 'Contact 3', AccountId = a1.ID);
-            insert c3;
-
-            Contact c4 = new Contact(LastName = 'Contact 4', AccountId = a1.ID);
-            insert c4;
-    
-            Case request = new Case(Origin = 'Phone',Subject = 'Event Booking', Description = 'Book Spots for Company A1 & their 4 employees', AccountId = a1.ID);
+            Case phoneCaseWithAccountContacts = TestDataFactory.createCaseWithAccount('Phone', 4);
             
             // When 
 
             Test.startTest();
 
-            Database.SaveResult result = Database.insert(request, false);
+            Database.SaveResult result = Database.insert(phoneCaseWithAccountContacts, false);
 
             Test.stopTest();
 
             // Then
-            System.assert(!result.isSuccess());
-            System.assert(result.getErrors().size() > 0);
+            System.assert(!result.isSuccess(), 'Case should not be created.');
+            System.assert(result.getErrors().size() > 0, 'There is no errors occured while creating this Case.');
             System.assertEquals('Phone request are only allowed to have three attendee',
-            result.getErrors()[0].getMessage());
+            result.getErrors()[0].getMessage(), 'Case does not contain the specified error message.');
 
         }
         
@@ -122,26 +91,18 @@ public class EventBookingTest {
         public static void bookEventFromTheWeb(){
             // Given
             
-            Account a1 = new Account(Name = 'Salesforce');
-            insert a1;
-                
-                   
-            Contact c1 = new Contact(LastName = 'Contact 1', AccountId = a1.ID);
-            insert c1;
-    
-            Case request = new Case(Origin = 'Web',Subject = 'Event Booking', Description = 'Book One Spot for Company A1', AccountId = a1.ID);
-            
+            Case phoneCaseWithAccountContacts = TestDataFactory.createCaseWithAccount('Web', 1);
             // When 
 
             Test.startTest();
 
-            Database.SaveResult result = Database.insert(request, false);
+            Database.SaveResult result = Database.insert(phoneCaseWithAccountContacts, false);
 
             Test.stopTest();
 
             // Then
 
-            System.assert(result.isSuccess());
+            System.assert(result.isSuccess(), 'Case creation should successful.');
 
                 
         } 
@@ -149,37 +110,43 @@ public class EventBookingTest {
         @isTest
         public static void refuseEventBookingWhenNumberOfAttendeesIsMoreThanOneForWebCases(){
             // Given
-            
-            Account a1 = new Account(Name = 'Salesforce');
-            insert a1;
-            
-            Contact c1 = new Contact(LastName = 'Contact 1', AccountId = a1.ID);
-            insert c1;
-    
-            Contact c2 = new Contact(LastName = 'Contact 2', AccountId = a1.ID);
-            insert c2;
-    
-            Contact c3 = new Contact(LastName = 'Contact 3', AccountId = a1.ID);
-            insert c3;
-    
-            Case request = new Case(Origin = 'Web',Subject = 'Event Booking', Description = 'Book Spots for Company A1 & their 3 employees', AccountId = a1.ID);
+        
+            Case phoneCaseWithAccountContacts = TestDataFactory.createCaseWithAccount('Web', 3);
             
             // When 
 
             Test.startTest();
 
-            Database.SaveResult result = Database.insert(request, false);
+            Database.SaveResult result = Database.insert(phoneCaseWithAccountContacts, false);
 
             Test.stopTest();
 
             // Then
-
-            System.assert(!result.isSuccess());
-            System.assert(result.getErrors().size() > 0);
+            System.assert(!result.isSuccess(), 'Case should not be created.');
+            System.assert(result.getErrors().size() > 0, 'There is no errors occured while creating this Case.');
             System.assertEquals('Web request are only allowed to have one attendee',
-            result.getErrors()[0].getMessage());
+            result.getErrors()[0].getMessage(), 'Case does not contain the specified error message.');
+        } 
 
-                
+        @isTest
+        public static void closeCase(){
+            // Given
+        
+            Case phoneCaseWithAccountContacts = TestDataFactory.createCaseWithAccount('Web', 1);
+            
+            // When 
+
+            Test.startTest();
+
+            Database.SaveResult result = Database.insert(phoneCaseWithAccountContacts, false);
+            phoneCaseWithAccountContacts.Status = 'Closed';
+            Database.SaveResult updateResult = Database.update(phoneCaseWithAccountContacts);
+            List<Task> tasks = Database.query('SELECT id FROM Task');
+            Test.stopTest();
+
+            // Then
+            System.assert(updateResult.isSuccess(), 'Case should be updated.');
+            System.assert(tasks.size() > 0, 'There should one task created after Case update');
         } 
     
     
