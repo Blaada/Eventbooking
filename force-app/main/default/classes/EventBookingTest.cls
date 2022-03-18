@@ -126,28 +126,5 @@ public class EventBookingTest {
             System.assert(result.getErrors().size() > 0, 'There is no errors occured while creating this Case.');
             System.assertEquals('Web request are only allowed to have one attendee',
             result.getErrors()[0].getMessage(), 'Case does not contain the specified error message.');
-        } 
-
-        @isTest
-        public static void closeCase(){
-            // Given
-        
-            Case phoneCaseWithAccountContacts = TestDataFactory.createCaseWithAccount('Web', 1);
-            
-            // When 
-
-            Test.startTest();
-
-            Database.SaveResult result = Database.insert(phoneCaseWithAccountContacts, false);
-            phoneCaseWithAccountContacts.Status = 'Closed';
-            Database.SaveResult updateResult = Database.update(phoneCaseWithAccountContacts);
-            List<Task> tasks = Database.query('SELECT id FROM Task');
-            Test.stopTest();
-
-            // Then
-            System.assert(updateResult.isSuccess(), 'Case should be updated.');
-            System.assert(tasks.size() > 0, 'There should one task created after Case update');
-        } 
-    
-    
+        }    
 }
